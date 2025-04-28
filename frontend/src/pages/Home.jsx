@@ -73,7 +73,7 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/products');
+        const response = await fetch('https://ijmrset-backend.onrender.com/products');
         const data = await response.json();
         console.log(data);
 
