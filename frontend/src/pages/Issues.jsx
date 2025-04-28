@@ -25,7 +25,7 @@ export default function Issues() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/products/grouped');
+        const response = await fetch('https://ijmrset-backend.onrender.com/products/grouped');
         const result = await response.json();
 
         const common = {};
