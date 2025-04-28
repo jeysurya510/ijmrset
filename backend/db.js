@@ -1,9 +1,7 @@
-const mysql = require('mysql2/promise');
+// db.js - Correct implementation
+const mysql = require('mysql2/promise'); // SINGLE declaration
 
-require('dotenv').config();
-const mysql = require('mysql2/promise'); // Using promise interface
-
-const db = mysql.createPool({
+const pool = mysql.createPool({
   host: process.env.MYSQLHOST,
   user: process.env.MYSQLUSER,
   password: process.env.MYSQLPASSWORD,
@@ -14,13 +12,5 @@ const db = mysql.createPool({
   ssl: { rejectUnauthorized: true }
 });
 
-db.getConnection((err, connection) => {
-  if (err) {
-    console.error('❌ MySQL Connection Failed:', err.message);
-  } else {
-    console.log('✅ Connected to MySQL Database');
-    connection.release();
-  }
-});
-
-module.exports = db;
+// Only export the pool, not mysql
+module.exports = pool;
