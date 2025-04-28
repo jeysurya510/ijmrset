@@ -4,7 +4,7 @@ const dbConfig = {
   host: 'proxy.rfwy.net',
   port: 28689,
   user: 'root',
-  password: 'myt15s0da1Ajxmpubtkb010cyptyhln',
+  password: 'mytISxVaIAjxmvpAUXhUOoTOCypMyhUn',
   database: 'railway',
   waitForConnections: true,
   connectionLimit: 10,
