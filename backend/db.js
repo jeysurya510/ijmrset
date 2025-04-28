@@ -7,7 +7,11 @@ const db = mysql.createPool({
   password: 'mytISxVaIAjxmvpAUXhUOoTOCypMyhUn', // Get from Railway Variables tab
   database: 'railway',
   port: 6872, // Default Railway MySQL port
-  ssl: { rejectUnauthorized: true }
+    waitForConnections: true,
+  connectionLimit: 10,
+  connectTimeout: 10000, // 10 seconds timeout
+  ssl: { 
+    rejectUnauthorized: true 
 });
 
 db.getConnection((err, connection) => {
