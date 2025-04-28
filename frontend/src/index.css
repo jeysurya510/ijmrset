@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'CustomFont2';
+  src: url('./assets/Fonts/uni-sans.heavy-caps.otf') format('opentype');
+}
+
+.font-lemonmilk {
+  font-family: 'CustomFont2';
+}
+
+.strong::before {
+  border: 2px dashed #000;
+  background-color: #ff4500;
+
+  content: '';
+  position: absolute;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  left: -2px;
+  bottom: -5%;
+  z-index: -1;
+  transform: rotate(-2deg);
+}
+
+.animated-text {
+  display: inline-flex; /* Keep letters inline */
+  overflow: hidden;
+}
+
+.animated-text span {
+  display: inline-block;
+  transform: translateX(20px); /* Start position */
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeInUp {
+  0% {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
