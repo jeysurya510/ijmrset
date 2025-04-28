@@ -1,46 +1,44 @@
 const mysql = require('mysql2/promise');
+require('dotenv').config();
+
+// Validate environment variables
+const requiredVars = ['DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD'];
+for (const varName of requiredVars) {
+  if (!process.env[varName]) {
+    console.error(`❌ Missing required environment variable: ${varName}`);
+    process.exit(1);
+  }
+}
 
 const dbConfig = {
-  host: 'proxy.rfwy.net',
-  port: 28689,
-  user: 'root',
-  password: 'mytISxVaIAjxmvpAUXhUOoTOCypMyhUn',
-  database: 'railway',
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
-  connectTimeout: 20000,
-  ssl: { rejectUnauthorized: false }, // MUST be false
-  enableKeepAlive: true
+  connectTimeout: 20000, // 20 seconds
+  ssl: process.env.NODE_ENV === 'production' ? { 
+    rejectUnauthorized: false 
+  } : null
 };
-
-console.log('Using PUBLIC DB config:', {
-  host: dbConfig.host,
-  port: dbConfig.port
-});
 
 const db = mysql.createPool(dbConfig);
 
-// Connection test
+// Test connection without logging credentials
 db.getConnection()
   .then(conn => {
-    console.log('✅ Connected via Railway public proxy');
-    return conn.query('SELECT 1')
-      .then(() => conn.release());
+    console.log('✅ Database connection established');
+    conn.release();
   })
   .catch(err => {
     console.error('❌ Connection failed:', {
       error: err.message,
-      config: {
-        host: dbConfig.host,
-        port: dbConfig.port,
-        usingSSL: true
-      }
+      code: err.code,
+      host: dbConfig.host, // Only log host, not credentials
+      port: dbConfig.port
     });
-    
-    console.log('\n🚨 REQUIRED ACTIONS:');
-    console.log('1. Enable Public Networking in Railway');
-    console.log('2. Whitelist Render IP in Networking');
-    console.log('3. Verify password in Railway Variables');
     process.exit(1);
   });
 
