@@ -1,29 +1,37 @@
-// db.js - Correct implementation
-const mysql = require('mysql2/promise'); // SINGLE declaration
+const mysql = require('mysql2/promise');
+require('dotenv').config();
 
 const db = mysql.createPool({
-  host: 'containers-us-west-45.railway.app',
-  user: 'root',
-  password: 'mytISxVaIAjxmvpAUXhUOoTOCypMyhUn',
-  database: 'railway',
-  port: 3306,
+  host: process.env.DB_HOST || 'containers-us-west-45.railway.app',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || 'mytISxVaIAjxmvpAUXhUOoTOCypMyhUn',
+  database: process.env.DB_NAME || 'railway',
+  port: process.env.DB_PORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
-  connectTimeout: 10000, // 10 seconds timeout
-  ssl: { 
-    rejectUnauthorized: true 
+  connectTimeout: 10000,
+  queueLimit: 0,
+  ssl: {
+    rejectUnauthorized: process.env.NODE_ENV === 'production' ? true : false
   }
 });
 
-db.getConnection((err, connection) => {
-  if (err) {
-    console.error('❌ MySQL Connection Failed:', err.message);
-  } else {
+// Test connection
+db.getConnection()
+  .then((connection) => {
     console.log('✅ Connected to MySQL Database');
     connection.release();
-  }
-});
+  })
+  .catch((err) => {
+    console.error('❌ MySQL Connection Failed:', err.message);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Connection config:', {
+        host: db.config.connectionConfig.host,
+        user: db.config.connectionConfig.user,
+        database: db.config.connectionConfig.database,
+        port: db.config.connectionConfig.port
+      });
+    }
+  });
 
-
-// Only export the pool, not mysql
 module.exports = db;
