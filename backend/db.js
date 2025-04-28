@@ -1,48 +1,47 @@
 const mysql = require('mysql2/promise');
-require('dotenv').config();
 
-// Railway-optimized configuration
 const dbConfig = {
-  host: process.env.DB_HOST || 'mysql.ralways.internal', // Internal DNS
-  port: parseInt(process.env.DB_PORT) || 3306, // Default MySQL port
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD, // Always use env var
-  database: process.env.DB_NAME || 'railway',
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   connectTimeout: 15000,
-  queueLimit: 0,
-  ssl: process.env.NODE_ENV === 'production' ? { 
-    rejectUnauthorized: false 
-  } : null,
-  enableKeepAlive: true
+  ssl: {
+    rejectUnauthorized: false // REQUIRED for Railway
+  }
 };
 
 const db = mysql.createPool(dbConfig);
 
-// Enhanced connection test
+// Verify connection
 db.getConnection()
   .then(conn => {
-    console.log('✅ Connected to Railway MySQL via internal network');
+    console.log('✅ Successfully connected to Railway MySQL');
     conn.release();
   })
   .catch(err => {
-    console.error('❌ Final Connection Attempt Failed:', {
+    console.error('❌ Connection failed:', {
       error: err.message,
       code: err.code,
       config: {
         host: dbConfig.host,
-        port: dbConfig.port
+        port: dbConfig.port,
+        usingSSL: !!dbConfig.ssl
       }
     });
     
-    console.log('\n🚨 ULTIMATE TROUBLESHOOTING:');
-    console.log('1. Run this in terminal: railway connect mysql');
-    console.log('2. Verify service status in Railway dashboard');
-    console.log('3. Check ALL variables match exactly');
-    console.log('4. Contact Railway support with your service logs');
+    console.log('\n🔧 Final Troubleshooting Steps:');
+    console.log('1. Execute: railway connect mysql');
+    console.log('2. Verify in Railway dashboard:');
+    console.log('   - MySQL service is "Running"');
+    console.log('   - Variables match exactly');
+    console.log('   - Networking shows public proxy active');
+    console.log('3. Check IP whitelisting in Settings → Networking');
     
-    process.exit(1); // Hard exit in production
+    process.exit(1);
   });
 
 module.exports = db;
