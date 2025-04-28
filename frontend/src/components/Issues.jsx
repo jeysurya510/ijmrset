@@ -11,8 +11,9 @@ export default function IssuesSection({ LastDate }) {
 
   useEffect(() => {
     const fetchData = async () => {
+      const apiUrl='https://ijmrset-backend.onrender.com'
       try {
-        const response = await fetch('https://ijmrset-backend.onrender.com/products/grouped');
+        const response = await fetch(`${apiUrl}/products/grouped`);
         const data = await response.json();
 
         const commonData = {};
