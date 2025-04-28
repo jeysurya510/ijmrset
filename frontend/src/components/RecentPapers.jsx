@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Author from '../assets/author.png';
+import Author from '../assets/Author.png';
 
 export default function RecentPapers({ SlideData }) {
   return (
