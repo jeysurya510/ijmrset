@@ -1,14 +1,14 @@
 const mysql = require('mysql2');
 
-const connection = mysql.createConnection({
-  host: 'shortline.proxy.rlwy.net', // use PUBLIC HOST
-  port: 28689, // use PUBLIC PORT
-  user: 'your_mysql_user', // from Railway Variables
-  password: 'your_mysql_password', // from Railway Variables
-  database: 'railway', // Database name
+const db = mysql.createConnection({
+  host: 'shortline.proxy.rlwy.net', // From Settings (Public Networking)
+  port: 28689,                       // From Settings (Public Networking)
+  user: 'root',           // From Variables (MYSQLUSER) — it's hidden, you must copy from Railway
+  password: 'mytISxVaIAjxmvpAUXhUOoTOCypMyhUn',   // From Variables (MYSQLPASSWORD) — shown partly in Variables
+  database: 'railway',               // From Variables (MYSQL_DATABASE)
 });
 
-connection.connect((err) => {
+db.connect((err) => {
   if (err) {
     console.error('❌ Error connecting to MySQL:', err);
     return;
@@ -16,5 +16,4 @@ connection.connect((err) => {
   console.log('✅ Connected to MySQL Database!');
 });
 
-module.exports = connection;
-
+module.exports = db;
