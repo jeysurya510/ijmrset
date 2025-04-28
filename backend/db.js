@@ -4,9 +4,9 @@ const mysql = require('mysql2/promise'); // SINGLE declaration
 const db = mysql.createPool({
   host: 'containers-us-west-45.railway.app',
   user: 'root',
-  password: 'mytISxVaIAjxmvpAUXhUOoTOCypMyhUn', // Get from Railway Variables tab
+  password: 'mytISxVaIAjxmvpAUXhUOoTOCypMyhUn',
   database: 'railway',
-  port: 6872, // Default Railway MySQL port
+  port: 3306,
   waitForConnections: true,
   connectionLimit: 10,
   connectTimeout: 10000, // 10 seconds timeout
