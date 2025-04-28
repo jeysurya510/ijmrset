@@ -1,84 +1,48 @@
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-// Railway-specific optimized configuration
+// Railway-optimized configuration
 const dbConfig = {
-  host: process.env.DB_HOST || 'proxy.rfwy.net', // From your screenshot
-  port: parseInt(process.env.DB_PORT) || 28689,  // From your screenshot
+  host: process.env.DB_HOST || 'mysql.ralways.internal', // Internal DNS
+  port: parseInt(process.env.DB_PORT) || 3306, // Default MySQL port
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD, // Always use env variables for passwords
+  password: process.env.DB_PASSWORD, // Always use env var
   database: process.env.DB_NAME || 'railway',
   waitForConnections: true,
   connectionLimit: 10,
-  connectTimeout: 15000, // 15 seconds timeout
+  connectTimeout: 15000,
   queueLimit: 0,
-  ssl: {
-    rejectUnauthorized: false // Railway requirement
-  },
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 10000,
-  namedPlaceholders: true // For safer queries
+  ssl: process.env.NODE_ENV === 'production' ? { 
+    rejectUnauthorized: false 
+  } : null,
+  enableKeepAlive: true
 };
 
 const db = mysql.createPool(dbConfig);
 
-// Enhanced connection test with Railway-specific checks
-async function verifyConnection() {
-  let conn;
-  try {
-    console.log('🔌 Testing Railway MySQL connection...');
-    conn = await db.getConnection();
-    
-    // Test query that works with all MySQL versions
-    const [results] = await conn.query('SELECT CONNECTION_ID() AS connection_id');
-    console.log('✅ Railway Connection Successful! Connection ID:', results[0].connection_id);
-    
-    return true;
-  } catch (err) {
-    console.error('❌ Railway Connection Failed:', {
+// Enhanced connection test
+db.getConnection()
+  .then(conn => {
+    console.log('✅ Connected to Railway MySQL via internal network');
+    conn.release();
+  })
+  .catch(err => {
+    console.error('❌ Final Connection Attempt Failed:', {
       error: err.message,
       code: err.code,
       config: {
         host: dbConfig.host,
-        port: dbConfig.port,
-        database: dbConfig.database
+        port: dbConfig.port
       }
     });
     
-    // Railway-specific troubleshooting tips
-    console.log('\n🚀 Railway Quick Fixes:');
-    console.log('1. Run `railway connect mysql` to test credentials');
-    console.log('2. Check Variables tab for correct DB_PASSWORD');
-    console.log('3. Whitelist IP in Settings → Networking');
-    console.log(`4. Try host: 'mysql.ralways.internal' for internal services`);
+    console.log('\n🚨 ULTIMATE TROUBLESHOOTING:');
+    console.log('1. Run this in terminal: railway connect mysql');
+    console.log('2. Verify service status in Railway dashboard');
+    console.log('3. Check ALL variables match exactly');
+    console.log('4. Contact Railway support with your service logs');
     
-    return false;
-  } finally {
-    if (conn) await conn.release();
-  }
-}
-
-// Execute on require (but only once)
-let connectionTestDone = false;
-if (!connectionTestDone) {
-  verifyConnection().then(success => {
-    if (!success && process.env.NODE_ENV === 'production') {
-      process.exit(1); // Exit if production and no DB connection
-    }
+    process.exit(1); // Hard exit in production
   });
-  connectionTestDone = true;
-}
 
-module.exports = {
-  pool: db,
-  query: db.query.bind(db),
-  getConnection: db.getConnection.bind(db),
-  checkHealth: async () => {
-    try {
-      const [res] = await db.query('SELECT 1 AS ok');
-      return { status: 'healthy', db: res[0].ok === 1 };
-    } catch (err) {
-      return { status: 'unhealthy', error: err.message };
-    }
-  }
-};
+module.exports = db;
