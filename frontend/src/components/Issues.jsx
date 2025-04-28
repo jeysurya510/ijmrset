@@ -15,7 +15,6 @@ export default function IssuesSection({ LastDate }) {
       try {
         const response = await fetch(`${apiUrl}/products/grouped`);
         const data = await response.json();
-
         const commonData = {};
         const specialData = {};
 
